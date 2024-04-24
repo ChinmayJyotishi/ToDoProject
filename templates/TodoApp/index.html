@@ -1,0 +1,189 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>To-Do App</title>
+    <!-- boostrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    
+    <!-- css -->
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <!-- fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik+Scribble&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee+Spice&display=swap" rel="stylesheet">
+</head>
+
+<body >
+    <div class="container-fluid">
+ 
+        <div class="row bg-dark text-white p-10">
+          
+            <div class="col-md-auto" style="padding: 10px; text-align:center; margin: auto; font-size: 30px;">
+                TASK MANAGEMENT SYSTEM 
+                
+                <span style="font-size: 20px; ">Dt:{{todays_date}}</span>
+            </div>
+            <!-- <div>
+                {{todays_date}}
+            </div> -->
+        </div>
+        <div class=" input_field">
+            <div style="margin-bottom: 25px;">
+                <form action=" {% url 'add_task' %}" method="post" class="form">
+                    {% csrf_token %}
+                    <div>
+                        <input type="text" class="form-control input" id="formGroupExampleInput"
+                            placeholder="Add your task here." name="task_input" >
+                    </div>
+        
+                    <button type="submit" class="btn btn-success btn-sm submit_btn">Submit</button>
+                    <!-- <button type="reset" class="btn btn-primary btn-sm">Reset</button> -->
+                </form>
+            </div>
+        </div>
+
+            <div class="row">
+                <div class="sections" id="task_pending">
+                    <div >
+                        <div id="sections_header1">
+                            To Do Task
+                        </div>
+                        <div style="overflow-y: auto; max-height: 320px;">
+                            <table class="table" >
+                            <thead >  
+                              <tr>
+                                <th scope="col">Sl.No.</th>
+                                <th scope="col">Tasks</th>
+                                <th scope="col">Edit Task</th>
+                              </tr>
+                            </thead>
+                            <tbody  >
+                                {% if incomplete_tasks %}
+                                {% for i in incomplete_tasks%}
+                                <tr style="background-color: rgba(134, 217, 232, 0.454);">
+                                   
+                                <th scope="row">{{forloop.counter}}</th>
+                                <td style="max-width: 340px;">{{i.task_name}}  </td>
+                                <td>{{i.time_added}}  </td>
+                                <td><a href="{% url 'task_done' i.id %}"><lord-icon
+                                    src="https://cdn.lordicon.com/dangivhk.json"
+                                    trigger="hover"
+                                    state="hover-pinch"
+                                    style="width:25px;height:25px;margin:-6px 2px;">
+                                </lord-icon></a>
+                                <a href="{% url 'task_update' i.id %}" >
+                                    <lord-icon src="https://cdn.lordicon.com/zfzufhzk.json" trigger="hover" state="hover-line" style="width:25px;height:25px;margin:-6px 2px;"></lord-icon>
+                                </a>
+                                <a href="{% url 'task_delete' i.id %}" ><lord-icon
+                                    src="https://cdn.lordicon.com/xekbkxul.json"
+                                    trigger="hover"
+                                    stroke="bold"
+                                    colors="primary:#121331,secondary:#e83a30,tertiary:#646e78,quaternary:#ebe6ef"
+                                    style="width:25px;height:25px;margin:-6px 2px;">
+                                </lord-icon></a>
+                            </td>
+                            {% endfor %}
+                            {% else %}
+                            <h5> No Records Found.</h5>
+                           {% endif %}
+                              </tr>
+                             
+                            </tbody>
+                          </table>
+                        </div>  
+                    </div>
+                </div>
+                <div class="sections" id="task_completed">
+                    <div>
+                        <div id="sections_header2">
+                            Completed Task
+                            <a href="{% url 'all_clear' %}"><button class="clear_all" type="submit" >Clear All</button></a>
+                        </div>
+                        <div style="overflow-y: auto; max-height: 250px;" >
+                            {% if complete_tasks %}
+                            {% for i in complete_tasks%}
+                            <div id="ul_list">
+                                <ol class="list-group" id="task-all-item">
+                                    <li style="margin-top: 15px;"> {{i.task_name}} <a href="{% url 'task_undo' i.id %}"><lord-icon
+                                        src="https://cdn.lordicon.com/tfwhvbiq.json"
+                                        trigger="hover"
+                                        stroke="bold"
+                                        colors="primary:#e86830,secondary:#121331"
+                                        style="width:25px;height:25px;margin:-6px 2px;">
+                                    </lord-icon></a></li>
+                                </ol>
+                            </div>
+                            <!-- <h5 class="card-title"> {{i.task_name}}</h5> -->
+                            {% endfor %}
+                            {% else %}
+                            <h5> No Tasks Completed Yet.</h5>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="sections" id="task_status">
+                    <div >
+                        <div id="sections_header3">
+                            Task Status
+                        </div>
+                        <div class="status" style="margin-top: -65px;margin-left: 20px; color: rgb(239,154,0);">
+                            <h4> <span style='   font-family: "Bungee Spice", sans-serif;
+                                font-weight: 400;
+                                font-style: normal;font-size: 68px;'>{{task_status_completed}}</span> <br>
+                                Out Of  <br>
+                                <span style='   font-family: "Bungee Spice", sans-serif;
+                                font-weight: 400;
+                                font-style: normal;font-size: 68px;'>{{task_status_pending}}</span></h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="progress_sections" id="task_progress">
+                    <div >
+                        <div id="progress">
+                            Track Your Progress
+                        </div>
+                        <div class="status" style="margin-top: -65px;margin-left: 20px; color: rgb(239,154,0);">
+                            <div class="all_progress">
+                                <!-- <span>Total Tasks</span>
+                            <div class="progress progress_" >
+                                <div class="progress-bar "  role="progressbar" style="width: {{pr_count}}%; " aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">{{pr_count}}%</div>
+                              </div> -->
+                            <span>Completed Tasks</span>
+                            <div class="progress progress_" >
+                                <div class="progress-bar "role="progressbar" style="width: {{progress_count}}%; " aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">{{progress_count}}%</div>
+                              </div>
+                              <span>Remaining Tasks</span>
+                            <div class="progress progress_" >
+                                <div class="progress-bar "  role="progressbar" style="width: {{progress_count_pending}}%; " aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">{{progress_count_pending}}%</div>
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+                  
+                </div>
+            </div>
+           
+            <!-- Button trigger modal -->
+
+  
+  <!-- Modal -->
+  
+        
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+            crossorigin="anonymous"></script>
+        <script src="https://cdn.lordicon.com/lordicon.js"></script>
+</body>
+
+</html>
+
